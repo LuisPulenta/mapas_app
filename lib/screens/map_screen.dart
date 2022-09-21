@@ -34,21 +34,26 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: BlocBuilder<LocationBloc, LocationState>(
-        builder: (context, state) {
-          if (state.lastKnownLocation == null) {
+        builder: (context, locationState) {
+          if (locationState.lastKnownLocation == null) {
             return const Center(
               child: Text('Espere por favor...'),
             );
           }
 
-          return SingleChildScrollView(
-            child: Stack(
-              children: [
-                MapView(
-                  initialLocation: state.lastKnownLocation!,
+          return BlocBuilder<MapBloc, MapState>(
+            builder: (context, mapState) {
+              return SingleChildScrollView(
+                child: Stack(
+                  children: [
+                    MapView(
+                      initialLocation: locationState.lastKnownLocation!,
+                      polylines: mapState.polylines.values.toSet(),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              );
+            },
           );
         },
       ),
