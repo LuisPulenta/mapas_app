@@ -14,7 +14,7 @@ class MapView extends StatelessWidget {
 
     final CameraPosition initialCameraPosition = CameraPosition(
       target: initialLocation,
-      zoom: 15,
+      zoom: 8,
     );
 
     final size = MediaQuery.of(context).size;
@@ -22,20 +22,23 @@ class MapView extends StatelessWidget {
     return SizedBox(
       width: size.width,
       height: size.height,
-      child: GoogleMap(
-        mapType: MapType.normal,
-        initialCameraPosition: initialCameraPosition,
-        compassEnabled: true,
-        myLocationEnabled: true,
-        zoomControlsEnabled: false,
-        myLocationButtonEnabled: false,
+      child: Listener(
+        onPointerMove: (pointerMoveEvent) =>
+            mapBloc.add(OnStopFollowingUserEvent()),
+        child: GoogleMap(
+          mapType: MapType.normal,
+          initialCameraPosition: initialCameraPosition,
+          compassEnabled: true,
+          myLocationEnabled: true,
+          zoomControlsEnabled: false,
+          myLocationButtonEnabled: false,
 
-        onMapCreated: (controller) =>
-            mapBloc.add(OnMapInitializedEvent(controller)),
+          onMapCreated: (controller) =>
+              mapBloc.add(OnMapInitializedEvent(controller)),
 
-        //TODO: Markers
-        //TODO: Polylinez
-        //TODO: Cuando se mueve el mapa
+          //TODO: Markers
+          //TODO: Polyline
+        ),
       ),
     );
     ;
