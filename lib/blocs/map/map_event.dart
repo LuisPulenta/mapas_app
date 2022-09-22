@@ -21,3 +21,5 @@ class UpdateUserPolylineEvent extends MapEvent {
   final List<LatLng> userLocations;
   const UpdateUserPolylineEvent(this.userLocations);
 }
+
+class OnToggleUserRoute extends MapEvent {}
