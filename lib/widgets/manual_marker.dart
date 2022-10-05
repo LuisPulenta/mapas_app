@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mapas_app/blocs/blocs.dart';
+import 'package:mapas_app/helpers/helpers.dart';
 
 class ManualMarket extends StatelessWidget {
   const ManualMarket({Key? key}) : super(key: key);
@@ -75,7 +76,14 @@ class _ManualMarketBody extends StatelessWidget {
                     final end = mapBloc.mapCenter;
                     if (end == null) return;
 
-                    await searchBloc.getCoorsStartToEnd(start, end);
+                    showLoadingMessage(context);
+
+                    final destination =
+                        await searchBloc.getCoorsStartToEnd(start, end);
+                    await mapBloc.drawRoutePolyline(destination);
+
+                    searchBloc.add(OnDeactivateManualMarkerEvent());
+                    Navigator.pop(context);
                   }),
             ),
           )
