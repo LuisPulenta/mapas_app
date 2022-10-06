@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:mapas_app/blocs/blocs.dart';
 import 'package:mapas_app/models/models.dart';
 
 class SearchDestinationDelegate extends SearchDelegate<SearchResult> {
@@ -27,11 +30,50 @@ class SearchDestinationDelegate extends SearchDelegate<SearchResult> {
 
   @override
   Widget buildResults(BuildContext context) {
-    return const Text('buildResults');
+    final searchBloc = BlocProvider.of<SearchBloc>(context);
+    final proximity =
+        BlocProvider.of<LocationBloc>(context).state.lastKnownLocation!;
+    searchBloc.getPlacesByQuery(proximity, query);
+
+    return BlocBuilder<SearchBloc, SearchState>(
+      builder: (context, state) {
+        final places = state.places;
+        return ListView.separated(
+          itemCount: places.length,
+          itemBuilder: (context, i) {
+            final place = places[i];
+            return ListTile(
+              title: Text(place.text!),
+              subtitle: Text(place.placeName!),
+              leading: const Icon(
+                Icons.place_outlined,
+                color: Colors.black,
+              ),
+              onTap: () {
+                final result = SearchResult(
+                    cancel: false,
+                    manual: false,
+                    position: LatLng(
+                        place.center![1] as double, place.center![0] as double),
+                    name: place.text,
+                    description: place.placeName);
+
+                searchBloc.add(AddToHistoryEvent(place));
+
+                close(context, result);
+              },
+            );
+          },
+          separatorBuilder: (context, i) => const Divider(),
+        );
+      },
+    );
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
+    final history = BlocProvider.of<SearchBloc>(context).state.history;
+
     return ListView(
       children: [
         ListTile(
@@ -42,7 +84,26 @@ class SearchDestinationDelegate extends SearchDelegate<SearchResult> {
             final result = SearchResult(cancel: false, manual: true);
             close(context, result);
           },
-        )
+        ),
+
+        //Construir la lista de elementos
+        ...history.map((place) => ListTile(
+              title: Text(place.text!),
+              subtitle: Text(place.placeName!),
+              leading: const Icon(
+                Icons.place_outlined,
+                color: Colors.black,
+              ),
+              onTap: () {
+                final result = SearchResult(
+                    cancel: false,
+                    manual: false,
+                    position: LatLng(place.center![1], place.center![0]),
+                    name: place.text,
+                    description: place.placeName);
+                close(context, result);
+              },
+            ))
       ],
     );
   }
