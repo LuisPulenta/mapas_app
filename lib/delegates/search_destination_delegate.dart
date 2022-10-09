@@ -53,8 +53,8 @@ class SearchDestinationDelegate extends SearchDelegate<SearchResult> {
                 final result = SearchResult(
                     cancel: false,
                     manual: false,
-                    position: LatLng(
-                        place.center![1] as double, place.center![0] as double),
+                    position: LatLng(place.center![1].toDouble(),
+                        place.center![0].toDouble()),
                     name: place.text,
                     description: place.placeName);
 
