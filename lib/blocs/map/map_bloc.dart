@@ -90,26 +90,33 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     kms = (kms * 100).floorToDouble();
     kms /= 100;
 
-    double tripDuration = (destination.duration / 60).floorToDouble();
+    int tripDuration = (destination.duration / 60).floorToDouble().toInt();
 
-    final startMaker = await getAssetImageMarker();
-    final endMaker = await getNetworkImageMarker();
+    // final startMaker = await getAssetImageMarker();
+    // final endMaker = await getNetworkImageMarker();
+
+    final startMaker = await getStartCustomMarker(tripDuration, 'Mi ubicación');
+    final endMaker =
+        await getEndCustomMarker(kms.toInt(), destination.endPlace.text!);
 
     final startMarket = Marker(
-        markerId: const MarkerId('start'),
-        position: destination.points.first,
-        icon: startMaker,
-        infoWindow: InfoWindow(
-            title: 'Inicio', snippet: 'Kms: $kms - Duración: $tripDuration'));
+      anchor: Offset(0.1, 1),
+      markerId: const MarkerId('start'),
+      position: destination.points.first,
+      icon: startMaker,
+      // infoWindow: InfoWindow(
+      //     title: 'Inicio', snippet: 'Kms: $kms - Duración: $tripDuration'),
+    );
 
     final endMarket = Marker(
-        markerId: const MarkerId('end'),
-        position: destination.points.last,
-        icon: endMaker,
-        //anchor: Offset(0, 0),
-        infoWindow: InfoWindow(
-            title: destination.endPlace.text,
-            snippet: destination.endPlace.placeName));
+      markerId: const MarkerId('end'),
+      position: destination.points.last,
+      icon: endMaker,
+      //anchor: Offset(0, 0),
+      // infoWindow: InfoWindow(
+      //     title: destination.endPlace.text,
+      //     snippet: destination.endPlace.placeName),
+    );
 
     final currentPolylines = Map<String, Polyline>.from(state.polylines);
     currentPolylines['route'] = myRoute;
@@ -121,7 +128,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     add(DisplayPolylinesEvent(currentPolylines, currentMarkers));
 
     await Future.delayed(const Duration(milliseconds: 300));
-    _mapController?.showMarkerInfoWindow(const MarkerId('start'));
+    // _mapController?.showMarkerInfoWindow(const MarkerId('start'));
   }
 
   void moveCamera(LatLng newLocation) {
