@@ -5,7 +5,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:mapas_app/helpers/helpers.dart';
 
 class ManualMarket extends StatelessWidget {
-  const ManualMarket({Key? key}) : super(key: key);
+  const ManualMarket({Key? key});
 
   @override
   Widget build(BuildContext context) {
